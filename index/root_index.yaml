@@ -228,7 +228,12 @@ schools:
     initial: "Z"
     resource_folder: "ZHKU"
 
-  - id: "YU"
+  - id: "GXDLXY"
+    name: "广西电力职业技术学院"
+    initial: "G"
+    resource_folder: "GXDLXY"
+
+  - id: "YANGTZEU"
     name: "长江大学"
     initial: "C"
-    resource_folder: "YU"
+    resource_folder: "YANGTZEU"
