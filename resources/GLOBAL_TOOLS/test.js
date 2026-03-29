@@ -7,12 +7,6 @@
         }
     }
 
-    function ensureBridgePromise() {
-        if (!window.AndroidBridgePromise) {
-            throw new Error("AndroidBridgePromise is unavailable.");
-        }
-    }
-
     function getBaseOrigin() {
         return window.location.origin;
     }
@@ -24,7 +18,7 @@
         });
 
         if (!response.ok) {
-            throw new Error(`Request failed (${response.status}): ${url}`);
+            throw new Error(`请求失败（${response.status}）：${url}`);
         }
 
         return response.text();
@@ -44,8 +38,7 @@
     function formatSemesterName(schoolYear, termName) {
         const suffixMap = {
             "1": "第一学期",
-            "2": "第二学期",
-            "3": "第三学期"
+            "2": "第二学期"
         };
         const suffix = suffixMap[String(termName || "").trim()] || `第${String(termName || "").trim()}学期`;
         return `${String(schoolYear || "").trim()}学年${suffix}`;
@@ -56,7 +49,7 @@
         try {
             data = Function(`return (${String(rawText || "").trim()});`)();
         } catch (_) {
-            throw new Error("Failed to parse semester response.");
+            throw new Error("学期数据解析失败。");
         }
 
         const semesters = [];
@@ -325,24 +318,12 @@
         if (!unitCount) return [];
 
         const courses = [];
-        const blockRegex = /activity\s*=\s*new\s+TaskActivity\(([^]*?)\)\s*;\s*index\s*=\s*(?:(\d+)\s*\*\s*unitCount\s*\+\s*(\d+)|(\d+))\s*;\s*table\d+\.activities\[index\]/g;
+        const blockRegex = /activity\s*=\s*new\s+TaskActivity\(([^]*?)\)\s*;([\s\S]*?)(?=activity\s*=\s*new\s+TaskActivity\(|table\d+\.marshalTable|$)/g;
         let match;
 
         while ((match = blockRegex.exec(text)) !== null) {
             const args = splitJsArgs(match[1] || "");
             if (args.length < 7) continue;
-
-            let linearIndex = -1;
-            if (match[2] != null && match[3] != null) {
-                linearIndex = Number(match[2]) * unitCount + Number(match[3]);
-            } else if (match[4] != null) {
-                linearIndex = Number(match[4]);
-            }
-            if (linearIndex < 0) continue;
-
-            const day = Math.floor(linearIndex / unitCount) + 1;
-            const section = (linearIndex % unitCount) + 1;
-            if (day < 1 || day > 7) continue;
 
             let teacher = unquoteJsLiteral(args[1]);
             if (/join\s*\(/.test(String(args[1] || ""))) {
@@ -353,16 +334,33 @@
             const position = unquoteJsLiteral(args[5]).replace(/\s+/g, " ").trim();
             const weeks = normalizeWeeks(parseValidWeeksBitmap(unquoteJsLiteral(args[6])));
             if (!name) continue;
+            const indexBlock = match[2] || "";
+            const indexRegex = /index\s*=\s*(?:(\d+)\s*\*\s*unitCount\s*\+\s*(\d+)|(\d+))\s*;\s*table\d+\.activities\[index\]/g;
+            let indexMatch;
 
-            courses.push({
-                name,
-                teacher: teacher || "未知教师",
-                position: position || "待定",
-                day,
-                startSection: section,
-                endSection: section,
-                weeks
-            });
+            while ((indexMatch = indexRegex.exec(indexBlock)) !== null) {
+                let linearIndex = -1;
+                if (indexMatch[1] != null && indexMatch[2] != null) {
+                    linearIndex = Number(indexMatch[1]) * unitCount + Number(indexMatch[2]);
+                } else if (indexMatch[3] != null) {
+                    linearIndex = Number(indexMatch[3]);
+                }
+                if (linearIndex < 0) continue;
+
+                const day = Math.floor(linearIndex / unitCount) + 1;
+                const section = (linearIndex % unitCount) + 1;
+                if (day < 1 || day > 7) continue;
+
+                courses.push({
+                    name,
+                    teacher: teacher || "未知教师",
+                    position: position || "待定",
+                    day,
+                    startSection: section,
+                    endSection: section,
+                    weeks
+                });
+            }
         }
 
         return mergeContiguousSections(courses);
@@ -451,8 +449,6 @@
     }
 
     async function runImportFlow() {
-        ensureBridgePromise();
-
         showToast("正在识别课表参数...");
         const params = await fetchEntryParams();
         if (!params.studentId || !params.tagId) {
@@ -511,7 +507,7 @@
             await runImportFlow();
         } catch (error) {
             console.error(error);
-            showToast(`导入失败: ${error.message || error}`);
+            showToast(`导入失败：${error.message || error}`);
         }
     })();
 })();
