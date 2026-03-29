@@ -249,7 +249,16 @@
     }
 
     function cleanCourseName(name) {
-        return String(name || "").replace(/\(\d+\)\s*$/, "").trim();
+        return String(name || "")
+            .replace(/\([A-Za-z0-9.]+\)\s*$/, "")
+            .trim();
+    }
+
+    function cleanPosition(position) {
+        return String(position || "")
+            .replace(/^鹤壁工程技术学院\s*/i, "")
+            .replace(/\s+/g, " ")
+            .trim();
     }
 
     function resolveTeachersForTaskActivityBlock(fullText, blockStartIndex) {
@@ -331,7 +340,7 @@
             }
 
             const name = cleanCourseName(unquoteJsLiteral(args[3]));
-            const position = unquoteJsLiteral(args[5]).replace(/\s+/g, " ").trim();
+            const position = cleanPosition(unquoteJsLiteral(args[5]));
             const weeks = normalizeWeeks(parseValidWeeksBitmap(unquoteJsLiteral(args[6])));
             if (!name) continue;
             const indexBlock = match[2] || "";
