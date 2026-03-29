@@ -250,13 +250,13 @@
 
     function cleanCourseName(name) {
         return String(name || "")
-            .replace(/\([A-Za-z0-9.]+\)\s*$/, "")
+            .replace(/\s*\([^()]*\)\s*$/, "")
             .trim();
     }
 
     function cleanPosition(position) {
         return String(position || "")
-            .replace(/^鹤壁工程技术学院\s*/i, "")
+            .replace(/鹤壁工程技术学院/g, "")
             .replace(/\s+/g, " ")
             .trim();
     }
