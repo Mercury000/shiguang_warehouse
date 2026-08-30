@@ -257,11 +257,13 @@ async function runImportFlow() {
         window.shiguangBridge.showToast("正在请求课程数据...");
 
         const response = await fetch("https://jwcmis.hnie.edu.cn/jsxsd/xskb/xskb_list.do", {
-            method: "GET",
+            method: "POST",
             headers: {
                 "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "content-type": "application/x-www-form-urlencoded",
                 "accept-language": "zh-CN,zh;q=0.9"
             },
+            body: `jx0404id=&cj0701id=&zc=&demo=&xnxq01id=${semesterId}`,
             credentials: "include"
         });
 
