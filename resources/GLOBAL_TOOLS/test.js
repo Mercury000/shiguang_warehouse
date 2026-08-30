@@ -255,7 +255,9 @@ async function runImportFlow() {
         const response = await fetch("https://jwcmis.hnie.edu.cn/jsxsd/xskb/xskb_list.do", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `cj0701id=&zc=&demo=&xnxq01id=${semesterId}`,
+            referrer: "https://jwcmis.hnie.edu.cn/jsxsd/xskb/xskb_list.do",
+            body: `cj0701id=&zc=&demo=&xnxq01id=${semesterId}&sfFD=1&wkbkc=1`,
+            mode: "cors",
             credentials: "include"
         });
 
