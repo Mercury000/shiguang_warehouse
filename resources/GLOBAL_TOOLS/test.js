@@ -233,13 +233,15 @@ async function runImportFlow() {
                 calendarBody += `&xqt=${i}&xqt=${i}`;
             }
             
-            const calendarResponse = await fetch("https://jwcmis.hnie.edu.cn/jsxsd/jxzl/jxzl_query", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: calendarBody,
-                credentials: "include"
+            const calendarHtml = await new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", "https://jwcmis.hnie.edu.cn/jsxsd/jxzl/jxzl_query", true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.withCredentials = true;
+                xhr.onload = () => resolve(xhr.responseText);
+                xhr.onerror = () => reject(new Error("XMLHttpRequest failed"));
+                xhr.send(calendarBody);
             });
-            const calendarHtml = await calendarResponse.text();
             const calendarInfo = parseWeekCalendar(calendarHtml);
             if (calendarInfo && calendarInfo.firstWeekMonday) {
                 // 转换格式：2026年09月07日 -> 2026-09-07
@@ -252,16 +254,15 @@ async function runImportFlow() {
 
         window.shiguangBridge.showToast("正在请求课程数据...");
 
-        const response = await fetch("https://jwcmis.hnie.edu.cn/jsxsd/xskb/xskb_list.do", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            referrer: "https://jwcmis.hnie.edu.cn/jsxsd/xskb/xskb_list.do",
-            body: `cj0701id=&zc=&demo=&xnxq01id=${semesterId}&sfFD=1&wkbkc=1`,
-            mode: "cors",
-            credentials: "include"
+        const html = await new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "https://jwcmis.hnie.edu.cn/jsxsd/xskb/xskb_list.do", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.withCredentials = true;
+            xhr.onload = () => resolve(xhr.responseText);
+            xhr.onerror = () => reject(new Error("XMLHttpRequest failed"));
+            xhr.send(`cj0701id=&zc=&demo=&xnxq01id=${semesterId}&sfFD=1&wkbkc=1`);
         });
-
-        const html = await response.text();
         const finalCourses = parseTimetableToModel(new DOMParser().parseFromString(html, "text/html"));
 
         if (finalCourses.length === 0) {
