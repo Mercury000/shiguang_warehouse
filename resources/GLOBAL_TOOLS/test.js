@@ -142,9 +142,9 @@ function parseWeekCalendar(html) {
         
         const weekNum = parseInt(firstCell);
         if (weekNum === 1) {
-            // 第1周，找周一（第二个td，索引1）
-            if (cells.length > 1) {
-                firstWeekMonday = cells[1].getAttribute('title');
+            // 第1周，找周一（索引2：周号0、周日1、周一2）
+            if (cells.length > 2) {
+                firstWeekMonday = cells[2].getAttribute('title');
             }
         }
         // 记录最后一周
