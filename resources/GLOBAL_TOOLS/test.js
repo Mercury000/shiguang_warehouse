@@ -235,11 +235,7 @@ async function runImportFlow() {
             
             const calendarResponse = await fetch("https://jwcmis.hnie.edu.cn/jsxsd/jxzl/jxzl_query", {
                 method: "POST",
-                headers: {
-                    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                    "content-type": "application/x-www-form-urlencoded",
-                    "accept-language": "zh-CN,zh;q=0.9"
-                },
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 body: calendarBody,
                 credentials: "include"
             });
@@ -258,12 +254,8 @@ async function runImportFlow() {
 
         const response = await fetch("https://jwcmis.hnie.edu.cn/jsxsd/xskb/xskb_list.do", {
             method: "POST",
-            headers: {
-                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "content-type": "application/x-www-form-urlencoded",
-                "accept-language": "zh-CN,zh;q=0.9"
-            },
-            body: `jx0404id=&cj0701id=&zc=&demo=&xnxq01id=${semesterId}`,
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `cj0701id=&zc=&demo=&xnxq01id=${semesterId}`,
             credentials: "include"
         });
 
