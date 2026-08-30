@@ -243,7 +243,7 @@ async function runImportFlow() {
             const calendarInfo = parseWeekCalendar(calendarHtml);
             if (calendarInfo && calendarInfo.firstWeekMonday) {
                 // 转换格式：2026年09月07日 -> 2026-09-07
-                semesterStartDate = calendarInfo.firstWeekMonday.replace(/(\d{4})年(\d{2})月(\d{2})日/, '$1-$2-$3');
+                semesterStartDate = calendarInfo.firstWeekMonday.replace(/(\d{4})年(\d{2})月(\d{2})日?/, '$1-$2-$3');
                 window.shiguangBridge.showToast(`开学日期: ${semesterStartDate}`);
             }
         } catch (e) {
